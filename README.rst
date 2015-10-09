@@ -4,7 +4,7 @@ Homotopy algorithm for l1-norm minimization
 
 This is a Python package that implement the homotopy algorithm described in 
 'Sparsity-Based Space-Time Adaptive Processing Using Complex-Valued Homotopy 
-Technique For Airborne Radar' by Zhaocheng Yang et al. 2013. It can applied to 
+Technique For Airborne Radar' by Zhaocheng Yang et al. 2013. It can be applied to 
 both real-valued and complex-valued l1-norm minimization problem.
 
 Installation
