@@ -20,7 +20,7 @@ class Homotopy:
     """A class implements the homotopy algorithm to do fast l1-norm minimization.
 
     This class implements the algorithm described in 'Sparsity-Based Space-Time
-    Adaptive Processing Using Complex-Valued Homotopy Technique For Airborne Radio'
+    Adaptive Processing Using Complex-Valued Homotopy Technique For Airborne Radar'
     by Zhaocheng Yang et al. 2013. It can applied to both real-valued and
     complex-valued l1-norm minimization problem.
     """
