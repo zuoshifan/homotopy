@@ -235,10 +235,9 @@ class Homotopy:
         G_minus, ind_minus = None, None
         for ind, i in enumerate(self.on_indices):
             tmp = -x[i] / d[i]
-            assert tmp.imag < precision, 'Not so small imaginary part of G_minus: %f' % tmp
-            tmp = -(x[i] / d[i]).real
-            # not exactly larger than 0 due to numerical error
-            if tmp > precision:
+            # not exactly larger than 0 due to numerical error, accept it only when it is a positive real number
+            if tmp.real > precision and tmp.imag < precision:
+                tmp = tmp.real
                 if ind == 0:
                     G_minus, ind_minus = tmp, i
                 else:
@@ -293,9 +292,46 @@ class Homotopy:
 
 if __name__ == "__main__":
 
-    A = np.array([[1.0,2.0,3.0],[1.0,3.0,1.5]], dtype=np.float64)
-    # A = np.array([[1.0,2.0,3.0],[1.0,3.0,1.5]], dtype=np.complex128)
-    y = np.array([6,6])
+    # real-valued case
+    print 'real-valued test...'
+    A = np.array([[1.0, 2.0, 3.0],[1.0, 3.0, 1.5]], dtype=np.float64)
+    y = np.array([6.0, 6.0])
+    h = Homotopy(A, y)
+    # case 0
+    print 'case 0...'
+    x = h.solve(1)
+    print x
+    # case 1
+    print 'case 1...'
+    x = h.solve()
+    print x
+    # case 2
+    print 'case 2...'
+    x, lbd = h.solve(6, epsilon=1.0e-8, return_lambda=True)
+    print x, lbd
+    # case 3
+    print 'case 3...'
+    x, lbd = h.solve(6, epsilon=1.0e-8, max_non_zero=1, return_lambda=True, warnings=True)
+    print x, lbd
+    # case 4
+    print 'case 4...'
+    x, lbd = h.solve(6, epsilon=1.0e-8, bisection=True, return_lambda=True, verbose=2)
+    print x, lbd
+    # case 5
+    print 'case 5...'
+    x, lbd = h.solve(6, epsilon=1.0e-8, verbose=1, return_lambda=True)
+    print x, lbd
+    # case 6
+    print 'case 6...'
+    x, lbd = h.solve(6, epsilon=1.0e-8, verbose=2, return_lambda=True)
+    print x, lbd
+
+    # complex-valued case
+    print
+    print '-'*80
+    print 'complex-valued test...'
+    A = np.array([[1.0, 2.0 + 0.5J, 3.0],[1.0, 3.0, 1.5]], dtype=np.complex128)
+    y = np.array([6.0, 6.0 + 1.0J])
     h = Homotopy(A, y)
     # case 0
     print 'case 0...'
