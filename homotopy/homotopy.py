@@ -42,7 +42,7 @@ class Homotopy:
         self.y = y
         self.dtype = np.promote_types(A.dtype, y.dtype)
 
-    def solve(self, max_iters, epsilon=1.0e-12, precision=1.0e-10, max_non_zero=None, return_lambda=False, bisection=False, warnings=True, verbose=0):
+    def solve(self, max_iters=None, epsilon=1.0e-12, precision=1.0e-10, max_non_zero=None, return_lambda=False, bisection=False, warnings=True, verbose=0):
         """Solve the l1-norm minimization problem.
 
         This will follow the solution path until the given conditions are satisfied
@@ -51,8 +51,9 @@ class Homotopy:
 
         Parameters
         ----------
-        max_iters : integer
-            Maximum number of iterations.
+        max_iters : None or integer, optional
+            Maximum number of iterations. Default: None, the number of columns of `A`
+            is used.
         epsilon : float, optional
             Desired l2 error of y - A x. Default: 1.0e-12.
         precision : float, optional
@@ -83,6 +84,8 @@ class Homotopy:
 
         is_bad = False
         is_error = False
+        if max_iters is None:
+            max_iters = self.ncols
         if max_non_zero is None:
             max_non_zero = self.ncols
         else:
@@ -163,13 +166,18 @@ class Homotopy:
                 print '  current error is %f (target is %f)\n.' % (cur_error, epsilon)
 
         if (not is_bad) and bisection:
+            if verbose > 0:
+                print 'Mid-point bisection between 0 and %f to find optimal gamma value.' % gamma
             # Mid-point bisection to find optimal gamma value
             low = 0.0
             high = gamma
             while high - low > precision:
                 mid = 0.5 * (low + high)
                 tmp = x - mid * d
-                if self.l2Error(tmp) > epsilon:
+                cur_error = self.l2Error(tmp)
+                if verbose > 1:
+                    print 'Mid-point bisection: low = %f, high = %f, mid = %f, l2Error = %f.' % (low, high, mid, cur_error)
+                if cur_error > epsilon:
                     high = mid
                 else:
                     low = mid
@@ -295,7 +303,7 @@ if __name__ == "__main__":
     print x
     # case 1
     print 'case 1...'
-    x = h.solve(6)
+    x = h.solve()
     print x
     # case 2
     print 'case 2...'
@@ -307,7 +315,7 @@ if __name__ == "__main__":
     print x, lbd
     # case 4
     print 'case 4...'
-    x, lbd = h.solve(6, epsilon=1.0e-8, bisection=True, return_lambda=True)
+    x, lbd = h.solve(6, epsilon=1.0e-8, bisection=True, return_lambda=True, verbose=2)
     print x, lbd
     # case 5
     print 'case 5...'
