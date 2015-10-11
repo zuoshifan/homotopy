@@ -84,6 +84,7 @@ class Homotopy:
 
         is_bad = False
         is_error = False
+        too_large_gamma = False
         if max_iters is None:
             max_iters = self.ncols
         if max_non_zero is None:
@@ -123,15 +124,22 @@ class Homotopy:
 
             result = self.computeG(x, d, precision)
             if result is None:
+                if warnings:
+                    print 'Could not get a gamma. You can decrease `precision` and try again'
                 break
             else:
                 gamma, ind, add = result
+            if gamma > self.lbd:
+                if warnings:
+                    print 'Get a too large gamma'
+                gamma = self.lbd
+                too_large_gamma = True
+            self.lbd -= gamma
             x += gamma * d
             if verbose > 1:
                 print 'd = ', d
                 print 'gamma = ', gamma
                 print 'x = ', x
-            self.lbd -= gamma
             cur_error = self.l2Error(x)
             if cur_error > epsilon:
                 if add:
@@ -144,6 +152,8 @@ class Homotopy:
 
             if verbose > 0:
                 print 'Iteration %d end: num_on = %d, lambda = %f, l2Error=%f' % (iters, len(self.on_indices), self.lbd, cur_error)
+            if too_large_gamma:
+                break
             iters += 1
 
         num_on = len(self.on_indices)
