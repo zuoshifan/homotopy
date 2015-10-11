@@ -42,7 +42,7 @@ class Homotopy:
         self.y = y
         self.dtype = np.promote_types(A.dtype, y.dtype)
 
-    def solve(self, max_iters=None, epsilon=1.0e-12, precision=1.0e-10, max_non_zero=None, return_lambda=False, bisection=False, warnings=True, verbose=0):
+    def solve(self, max_iters=None, epsilon=1.0e-12, precision=1.0e-10, max_non_zero=None, stop_inc_err=False, return_lambda=False, bisection=False, warnings=True, verbose=0):
         """Solve the l1-norm minimization problem.
 
         This will follow the solution path until the given conditions are satisfied
@@ -62,6 +62,8 @@ class Homotopy:
         max_non_zero : None or integer, optional
             The maximum number of non zero elements in the final solution. Default: None,
             means no limit for number of non zero elements.
+        stop_inc_err : boolean, optional
+            Stop iteration when l2 error begin to increase. Default: False.
         return_lambda : boolean, optional
             Also return the final lambda value is True. Default: False.
         bisection : boolean, optional
@@ -134,13 +136,20 @@ class Homotopy:
                     print 'Get a too large gamma'
                 gamma = self.lbd
                 too_large_gamma = True
+
+            tmp_error = self.l2Error(x + gamma * d)
+            if stop_inc_err:
+                if tmp_error > cur_error:
+                    if warnings:
+                        print 'Stop iteration due to l2 error increase'
+                    break
+            cur_error = tmp_error
             self.lbd -= gamma
             x += gamma * d
             if verbose > 1:
                 print 'd = ', d
                 print 'gamma = ', gamma
                 print 'x = ', x
-            cur_error = self.l2Error(x)
             if cur_error > epsilon:
                 if add:
                     self.on_indices.append(ind)
