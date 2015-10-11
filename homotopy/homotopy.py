@@ -93,7 +93,7 @@ class Homotopy:
             max_non_zero = min(max_non_zero, self.ncols)
 
         # initialize x, lambda and active set
-        self.c = np.dot(A.T.conj(), y)
+        self.c = np.dot(self.A.T.conj(), self.y)
         self.lbd = np.max(np.abs(self.c)) # lambda
         on_ind = np.argmax(np.abs(self.c))
         self.on_indices = [ on_ind ]
